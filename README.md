@@ -1,4 +1,4 @@
-# API Gateway
+# GATEHUB
 
 A lightweight API Gateway built from scratch in Node.js and Express — implementing reverse proxy routing, round-robin load balancing, automatic health-check-based failover, and per-client rate limiting, with request logging and live monitoring endpoints. Fully containerized with Docker Compose.
 
