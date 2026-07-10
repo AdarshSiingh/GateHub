@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  users-service-1:
+    build: .
+    command: node dummy-service/server.js
+    environment:
+      - PORT=8081
+    ports:
+      - "8081:8081"
+
+  users-service-2:
+    build: .
+    command: node dummy-service/server.js
+    environment:
+      - PORT=8082
+    ports:
+      - "8082:8082"
+
+  gateway:
+    build: .
+    command: node gateway/gateway.js
+    environment:
+      - USERS_INSTANCES=http://users-service-1:8081,http://users-service-2:8082
+    ports:
+      - "9000:9000"
+    depends_on:
+      - users-service-1
+      - users-service-2
