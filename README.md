@@ -17,7 +17,6 @@ This project was built to understand and demonstrate the core mechanics behind A
 - [API endpoints](#api-endpoints)
 - [Demo: automatic failover](#demo-automatic-failover)
 - [Demo: rate limiting](#demo-rate-limiting)
-- [Design decisions](#design-decisions)
 - [What I learned](#what-i-learned)
 - [Possible future improvements](#possible-future-improvements)
 
