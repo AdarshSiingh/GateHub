@@ -8,6 +8,7 @@ const requestLogger = require('./logger');
 const stats = require('./stats');
 
 const app = express();
+app.use(express.static('gateway/public'));
 
 startHealthChecks();
 

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Gateway Dashboard</title>
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      background: #f7f7f5;
+      color: #222;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h1 { font-size: 20px; font-weight: 500; }
+    .subtitle { color: #777; font-size: 14px; margin-top: -8px; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .metric-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #e5e5e0;
+    }
+    .metric-label { font-size: 13px; color: #777; margin: 0 0 4px; }
+    .metric-value { font-size: 24px; font-weight: 500; margin: 0; }
+    .metric-value.success { color: #2f9e5e; }
+    .metric-value.danger { color: #d64545; }
+
+    .instances { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+    .instance-card {
+      background: #fff;
+      border: 1px solid #e5e5e0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .healthy { background: #2f9e5e; }
+    .down { background: #d64545; }
+
+    .section-label { font-size: 13px; color: #777; margin: 20px 0 8px; }
+  </style>
+</head>
+<body>
+
+  <h1>API Gateway Dashboard</h1>
+  <p class="subtitle" id="lb-info">Round Robin · Uptime --</p>
+
+  <div class="metrics">
+    <div class="metric-card">
+      <p class="metric-label">Total requests</p>
+      <p class="metric-value" id="total">--</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Successful</p>
+      <p class="metric-value success" id="success">--</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Blocked (429)</p>
+      <p class="metric-value danger" id="blocked">--</p>
+    </div>
+  </div>
+
+  <p class="section-label">Backend instances</p>
+  <div class="instances" id="instances-list"></div>
+
+  <script>
+    async function refreshDashboard() {
+      try {
+        const statusRes = await fetch('/gateway/status');
+        const status = await statusRes.json();
+
+        const statsRes = await fetch('/gateway/stats');
+        const stats = await statsRes.json();
+
+        document.getElementById('lb-info').textContent =
+          `${status.loadBalancer} · Uptime ${status.uptime}`;
+
+        document.getElementById('total').textContent = stats.totalRequests;
+        document.getElementById('success').textContent = stats.successfulRequests;
+        document.getElementById('blocked').textContent = stats.blockedRequests;
+
+        const allKnownInstances = [
+          'http://users-service-1:8081',
+          'http://users-service-2:8082',
+        ];
+
+        const listEl = document.getElementById('instances-list');
+        listEl.innerHTML = '';
+
+        allKnownInstances.forEach((instance) => {
+          const isHealthy = status.healthyInstances.includes(instance);
+          const card = document.createElement('div');
+          card.className = 'instance-card';
+          card.innerHTML = `
+            <span class="dot ${isHealthy ? 'healthy' : 'down'}"></span>
+            <span>${instance} — ${isHealthy ? 'Healthy' : 'Down'}</span>
+          `;
+          listEl.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error('Failed to refresh dashboard:', err);
+      }
+    }
+
+    refreshDashboard();
+    setInterval(refreshDashboard, 3000);
+  </script>
+
+</body>
+</html>

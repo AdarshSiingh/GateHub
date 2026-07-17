@@ -1,22 +1,38 @@
 const stats = require('./stats');
 
 function requestLogger(req, res, next) {
-  stats.recordRequest();
+  const isMonitoringRoute = req.path.startsWith('/gateway/');
+
+  if (!isMonitoringRoute) {
+    stats.recordRequest();
+  }
+
   const start = Date.now();
   const timestamp = new Date().toLocaleTimeString();
+  let counted = false;
 
-  res.on('finish', () => {
+  function finalize() {
+    if (counted) return;
+    counted = true;
+
     const duration = Date.now() - start;
     const target = req.chosenInstance || 'unknown';
 
-    if (res.statusCode < 400) {
-      stats.recordSuccess();
+    if (!isMonitoringRoute) {
+      if (res.statusCode < 400) {
+        stats.recordSuccess();
+      } else {
+        stats.recordBlocked();
+      }
     }
 
     console.log(
       `[${timestamp}] ${req.method} ${req.originalUrl} -> ${target} (${res.statusCode}) - ${duration}ms`
     );
-  });
+  }
+
+  res.on('finish', finalize);
+  res.on('close', finalize);
 
   next();
 }

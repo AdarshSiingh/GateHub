@@ -12,6 +12,11 @@ setInterval(() => {
 }, WINDOW_MS);
 
 function rateLimiter(req, res, next) {
+
+  if (req.path.startsWith('/gateway/')) {
+    return next();
+  }
+  
   const ip = req.ip;
 
   if (!requestCounts[ip]) {
@@ -20,7 +25,6 @@ function rateLimiter(req, res, next) {
   requestCounts[ip]++;
 
   if (requestCounts[ip] > REQUEST_LIMIT) {
-    stats.recordBlocked();
     return res.status(429).send('Too Many Requests - slow down');
   }
 
