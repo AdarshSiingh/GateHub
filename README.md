@@ -1,5 +1,8 @@
 # GATEHUB
 
+**Live demo:** [https://gatehub-r79p.onrender.com/dashboard.html](https://gatehub-r79p.onrender.com/dashboard.html)<br>
+**Live gateway:** [https://gatehub-r79p.onrender.com/](https://gatehub-r79p.onrender.com/)
+
 A lightweight API Gateway built from scratch in Node.js and Express — implementing reverse proxy routing, round-robin load balancing, automatic health-check-based failover, and per-client rate limiting, with request logging and live monitoring endpoints. Fully containerized with Docker Compose.
 
 This project was built to understand and demonstrate the core mechanics behind API gateways used in real-world distributed systems — without relying on existing gateway frameworks (like Kong or Spring Cloud Gateway) to do the work invisibly.
